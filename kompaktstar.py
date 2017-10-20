@@ -26,6 +26,7 @@ while True:
 	rho=(p**(3./5.))/((5.3802*10**9)**(3./5.))
         rho_tot += rho
 	n += 1
+        print('got immer noni')
 
     
     
