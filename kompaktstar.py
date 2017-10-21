@@ -94,7 +94,7 @@ plt.figure(1)
 plt.xlabel(r"Radius $r$ [km]")
 plt.ylabel(r"$1-\frac{2Gm}{c^2r}$")
 plt.title('Dichte-Profil des Neutronensterns')
-plt.plot(rrvec, dlvec)
+plt.plot(rrvec, dlvec, 'x')
 pylab.savefig('dimless.png', dpi=300)
 
 
