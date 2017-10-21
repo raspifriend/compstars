@@ -1,32 +1,80 @@
 import numpy as np
-import matplotlib.pyplot as plt
+from scipy.integrate import quad
+from matplotlib import pyplot as plt
 
-rho_c=2*10**14;
-G=6.674*10**(-8);
-K = 5.3802*10**9;
 
-dr = 1000;
+# Definiere Konstanten (Einheiten im cgs-System)
+rho_c = 2.0*10**14	# zentrale Dichte
+G = 6.674*10**(-8)	# Gravitationskonstange
+K = 5.3802*10**9	# aus Shapiro, Teukolsky, nicht-relativistisches Neutronengas (nrel-ngas)
+A = 2./3.*np.pi*G 	# mehrmals verwendete Konstante
+g = 5./3.		# Gamma der Zustandsgleichung (EOS) p=rho^Gamma für nrel-ngas	
+b = 3./5.		# 1/Gamma
+
+# Berechne Druck im Zentrum mit EOS
 rho=rho_c;
-p_c=K*rho_c**(5./3.);
-rho_tot = rho_c;
-print(p_c, rho)
+p_c=K*rho_c**g;
 
-p=p_c-rho_c**2*2./3.*np.pi*G*dr**2
-print(p)
-rho=p**(3./5.)/((5.3802*10**9)**(3./5.))
-print(rho)
-rho_tot += rho
-print(rho_tot)
-n=2
+#Schrittweite der Integration nach r (in cm)
+dr = 10.0;
 
+# Definiere Funktion zur Berechnung von dm und dp (Sternstruktur-Gleichungen)
+def mass(r, d):
+    return 4.0*np.pi*r**2.0*d
+def press(r, m, d):
+    return (1/(r**2.0))*(-G*m*d)
+
+# 1. Integrationsschritt von r=0 nach r=dr mittels Näherung rho=rho_c (aus Vorlesung [26.9.17])
+p = p_c-rho_c**2.0*A*dr**2.0
+rho = (p/K)**b
+M = 0.0
+
+# Definiere Vektoren r, p, m und rho zum Plotten
+rvec = [0.0, dr]
+pvec = [p_c,p]
+mvec = [0.0, 4./3.*np.pi*dr**3.0*rho_c]
+rhovec = [rho_c, rho]
+
+n=2.0	#n. Integrationsschritt
+
+# numerische Integration zur schrittweise Berechnung von rho(r) und p(r)
 while True:
-	dp = 2./3.*np.pi*G*rho_tot*rho**2*dr**2*(n**3-(n-1)**3)/(n*(n-1))
-	p = p-dp
-	print(p,dp)
-	rho=(p**(3./5.))/((5.3802*10**9)**(3./5.))
-        rho_tot += rho
-	n += 1
-        print('got immer noni')
+    d = rho
+    # berechne Masse der n-ten Massenschale durch Integration
+    m = quad(mass,(n-1.0)*dr,n*dr,args=(d))
+    # addiere die neuberechnete Massenschale zur Gesamtmasse M
+    M += m[0]
+    # berechne Druckänderung bei der n-ten Massenschale durch Integration
+    P = quad(press,(n-1.0)*dr, n*dr, args=(M,d))
+    # neuer Druck berechnen
+    p = p+P[0]
+    # neu berechneter Druckwert p an Vektor anhängen
+    pvec = np.append(pvec,p)
+    # r-Vektor um r+dr erweitern
+    rvec = np.append(rvec,rvec[-1]+dr)
+    # m-Vektor um aktuelle Masse erweitern
+    mvec = np.append(mvec,M)
+    # neu berechnete Dichte rho an Vektor anhängen
+    rhovec = np.append(rhovec, rho)
+    if p<0:
+        break 
+    rho =(p/K)**b
+    #Integrationsschritt n um 1 erhöhen
+    n += 1	
+
+# Daten in txt-Datei abspeichern
+data = np.array([rvec,rhovec,pvec,mvec])
+data = data.T
+np.savetxt('data.txt',data)
+
+# Plotte das Dichte-Profil
+plt.xlabel('Radius r')
+plt.ylabel('Dichte rho')
+plt.title('Dichte-Profil Neutronenstern')
+plt.plot(rvec, rhovec)
+plt.show()
+plt.savefig('plot.png')
+
 
     
     
