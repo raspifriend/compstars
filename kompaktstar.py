@@ -101,7 +101,5 @@ plt.plot(rrvec, dlvec, 'x')
 pylab.savefig('dimless.png', dpi = 300)
 
 # Felix Läderach
-
-
     
     
