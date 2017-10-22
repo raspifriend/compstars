@@ -14,8 +14,8 @@ g = 5./3.		# Gamma der Zustandsgleichung (EOS) p=rho^Gamma für nrel-ngas
 b = 3./5.		# 1/Gamma
 
 # Berechne Druck im Zentrum mit EOS
-rho=rho_c
-p_c=K*rho_c**g
+rho = rho_c
+p_c = K*rho_c**g
 
 # Schrittweite der Integration nach r (in cm)
 dr = 100.0
@@ -40,18 +40,18 @@ pvec = [p_c, p]
 mvec = [0.0, 4./3.*np.pi*dr**3.0*rho_c]
 rhovec = [rho_c]
 
-n=2.0	# n. Integrationsschritt
+n = 2.0	# n. Integrationsschritt
 
 # numerische Integration zur schrittweise Berechnung von rho(r) und p(r)
 while p>=0:
+    # berechne Dichte rho
     rho = (p/K)**b
-    d = rho
     # berechne Masse der n-ten Massenschale durch Integration
-    m = quad(mass,(n-1.0)*dr,n*dr,args=(d))
+    m = quad(mass,(n-1.0)*dr,n*dr,args=(rho))
     # addiere die neuberechnete Massenschale zur Gesamtmasse M
     M += m[0]
     # berechne Druckänderung bei der n-ten Massenschale durch Integration
-    P = quad(press,(n-1.0)*dr, n*dr, args=(M,d))
+    P = quad(press,(n-1.0)*dr, n*dr, args=(M, rho))
     # neuer Druck berechnen
     p = p+P[0]
     # neu berechneter Druckwert p an Vektor anhängen
@@ -79,7 +79,6 @@ for i in range(1, 20):
     dlvec = np.append(dlvec, dl)
     rrvec = np.append(rrvec, rrvec[-1]+1)
 
-
 # Daten in txt-Datei abspeichern
 data = np.array([rvec, rhovec, pvec, mvec])
 data = data.T
@@ -92,7 +91,7 @@ plt.xlabel(r"Radius $r$ [km]")
 plt.ylabel(r"Dichte $\rho$ [$\cdot 10^{14}\frac{g}{cm^3}$]")
 plt.title('Dichte-Profil des Neutronensterns')
 plt.plot(1.0*10**(-5)*rvec, 1.0*10**(-14)*rhovec) # von cm --> km
-pylab.savefig('plot.png', dpi=300)
+pylab.savefig('dichteprofil.png', dpi = 300)
 
 # Plot die dimensionslose Grösse 1-2Gm/(c^2*r)
 plt.figure(1)
@@ -100,7 +99,7 @@ plt.xlabel(r"Radius $r$ [km]")
 plt.ylabel(r"$1-\frac{2Gm}{c^2r}$")
 plt.title('Dimensionslose Grösse')
 plt.plot(rrvec, dlvec, 'x')
-pylab.savefig('dimless.png', dpi=300)
+pylab.savefig('dimless.png', dpi = 300)
 
 # Felix Läderach
 
