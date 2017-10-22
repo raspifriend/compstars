@@ -36,14 +36,14 @@ M = 0.0
 
 # Definiere Vektoren r, p, m und rho zum Plotten
 rvec = [0.0, dr]
-pvec = [p_c,p]
+pvec = [p_c, p]
 mvec = [0.0, 4./3.*np.pi*dr**3.0*rho_c]
-rhovec = [rho_c,rho]
+rhovec = [rho_c]
 
 n=2.0	# n. Integrationsschritt
 
 # numerische Integration zur schrittweise Berechnung von rho(r) und p(r)
-while p>0:
+while p>=0:
     rho = (p/K)**b
     d = rho
     # berechne Masse der n-ten Massenschale durch Integration
@@ -64,6 +64,11 @@ while p>0:
     rhovec = np.append(rhovec, rho)
     #Integrationsschritt n um 1 erhöhen
     n += 1	
+
+# negative Druckwerte wegschneiden (ebenso dazugehörige Werte von r und M)
+rvec = np.delete(rvec,-1)
+pvec = np.delete(pvec,-1)
+mvec = np.delete(mvec,-1)
 
 # Dimensionslose Grösse 1-2Gm/(c^2*r) berechnen für r = 0-19 km in 1km-Schritten
 dlvec = [1]
@@ -93,7 +98,7 @@ pylab.savefig('plot.png', dpi=300)
 plt.figure(1)
 plt.xlabel(r"Radius $r$ [km]")
 plt.ylabel(r"$1-\frac{2Gm}{c^2r}$")
-plt.title('Dichte-Profil des Neutronensterns')
+plt.title('Dimensionslose Grösse')
 plt.plot(rrvec, dlvec, 'x')
 pylab.savefig('dimless.png', dpi=300)
 
