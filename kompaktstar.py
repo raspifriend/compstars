@@ -3,7 +3,6 @@ import pylab
 from scipy.integrate import quad
 from matplotlib import pyplot as plt
 
-
 # Definiere Konstanten (Einheiten im cgs-System)
 rho_c = 2.0*10**14	# zentrale Dichte
 G = 6.674*10**(-8)	# Gravitationskonstange
